@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>長者防騙模擬器 - DEMO</title>
+    <title>防騙先鋒---verion 1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+HK:wght=700;900&display=swap');
@@ -13,14 +13,11 @@
             color: #f1f5f9;
             -webkit-tap-highlight-color: transparent;
         }
-        /* 玻璃面板：改為 h-auto 讓內容自然向下延伸，完全不塞死高度 */
         .glass-panel { 
             background: rgba(15, 23, 42, 0.98); 
             backdrop-filter: blur(24px); 
             border: 2px solid rgba(255, 255, 255, 0.15);
         }
-        
-        /* FOR ELDERLY */
         .tag-mystery { 
             padding: 8px 16px; 
             border-radius: 12px; 
@@ -34,86 +31,61 @@
         }
         .tag-green { background: #10b981 !important; border-color: #34d399 !important; color: #ffffff; }
         .tag-red { background: #ef4444 !important; border-color: #f87171 !important; color: #ffffff; }
-
-        .btn-disabled { opacity: 0.3; cursor: not-allowed; background-color: #475569 !important; text-decoration: line-through; }
+        .btn-disabled { opacity: 0.4; cursor: not-allowed; background-color: #475569 !important; }
     </style>
 </head>
-<!-- 讓整個 Body 處理全螢幕滾動，長者操作更符合直覺 -->
 <body class="min-h-screen w-screen flex flex-col items-center justify-start bg-slate-950 p-3 overflow-y-auto select-none">
 
-    <!-- 開始畫面與遊戲說明 -->
     <div id="intro-screen" class="glass-panel rounded-3xl max-w-md w-full p-5 flex flex-col text-center shadow-2xl my-auto">
         <div>
             <div class="text-6xl my-2">🛡️</div>
-            <h1 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-amber-400 mb-2">長者防騙模擬器</h1>
-            <p class="text-xl text-amber-300 font-bold mb-4">精明老友記心理戰（共10輪）</p>
+            <h1 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-amber-400 mb-2">防騙模擬器</h1>
+            <p class="text-xl text-amber-300 font-bold mb-4">與騙徒嘅鬥智鬥勇（共 6 輪）</p>
             
             <div class="bg-slate-900/90 border-2 border-white/10 rounded-2xl p-4 text-left text-base text-slate-200 space-y-3">
-                <p class="font-black text-amber-400 text-lg mb-1">📖 簡單玩法說明：</p>
-                <p>• <span class="text-white font-black">灰色訊息：</span>對方的說話真假未明。</p>
-                <p>• <span class="text-indigo-300 font-black">繼續傾下：</span>幫你查真假，變<span class="text-emerald-400 font-black">綠色</span>好人，變<span class="text-rose-400 font-black">紅色</span>騙徒！</p>
-                <p>• <span class="text-emerald-400 font-black">冷靜機制：</span>成功搵出大話，阿伯阿婆大腦會變返冷靜（<span class="text-emerald-400 font-black">急切值即時 -10%</span>）。</p>
-                <p>• <span class="text-amber-300 font-black">最終目標：</span>冇被騙錢，且<span class="text-white font-black">冇將真正有需要嘅親友拒之門外</span>！</p>
+                <p class="font-black text-amber-400 text-lg mb-1">📖 玩法與雙重限制說明：</p>
+                <p>• <span class="text-white font-black">灰色訊息：</span>對方的說話與線索真假未明。</p>
+                <p>• <span class="text-indigo-300 font-black">繼續傾下：</span>幫你抽絲剝繭，變<span class="text-emerald-400 font-black">綠色安全手段</span>或<span class="text-rose-400 font-black">紅色詐騙破綻</span>。</p>
+                <p class="text-rose-400 font-bold">⚠️ 次數限制：每回合最多傾 3 次，且全場全局共享 6 次！請將 quota 留喺最可疑嘅關卡。</p>
+                <p>• <span class="text-amber-300 font-black">最終目標：</span>守住積蓄，且不誤拒真正有需要的親友！</p>
             </div>
         </div>
-
         <button onclick="startGame()" class="w-full py-4 bg-gradient-to-r from-amber-500 to-red-600 text-white font-black text-2xl rounded-2xl shadow-lg active:scale-95 transition-transform mt-5">▶️ 開始挑戰</button>
     </div>
 
-    <!-- 遊戲主畫面（全新佈局：全展開、無滑動框、整體滾動） -->
     <div id="game-container" class="hidden w-full max-w-md glass-panel rounded-3xl flex flex-col shadow-2xl my-auto h-auto overflow-hidden">
         
-        <!-- 頂部資訊欄 -->
-        <div class="px-4 py-3 border-b-2 border-white/10 flex justify-between bg-slate-900/70 items-center">
-            <h1 class="text-lg font-black text-amber-400">防騙模擬器</h1>
-            <div class="text-sm font-black text-slate-300">第 <span id="turn-count" class="font-black text-xl text-white">01</span> / 10 輪</div>
+        <div class="px-4 py-4 border-b-2 border-white/10 flex justify-between bg-slate-900/70 items-center">
+            <h1 class="text-xl font-black text-amber-400">🛡️ 防騙情報局</h1>
+            <div class="text-base font-black text-slate-300">第 <span id="turn-count" class="font-black text-2xl text-white">01</span> / <span id="total-round-count" class="text-white font-black text-2xl">06</span> 輪</div>
         </div>
 
-        <!-- 核心數值顯示 -->
-        <div class="px-4 py-3 bg-slate-900/80 space-y-2 border-b-2 border-white/10">
-            <div>
-                <div class="flex justify-between text-xs font-black mb-1"><span class="text-amber-400">🚨 騙徒催促（滿100%會中計）</span><span id="urge-val" class="text-sm text-white">30%</span></div>
-                <div class="h-3 bg-slate-800 rounded-full overflow-hidden border border-white/5"><div id="urge-bar" class="h-full bg-gradient-to-r from-amber-400 to-red-500 transition-all" style="width:30%"></div></div>
-            </div>
-            <div>
-                <div class="flex justify-between text-xs font-black mb-1"><span class="text-sky-400">⚠️ 你的反應（滿100%會崩潰）</span><span id="suspicion-val" class="text-sm text-white">30%</span></div>
-                <div class="h-3 bg-slate-800 rounded-full overflow-hidden border border-white/5"><div id="suspicion-bar" class="h-full bg-gradient-to-r from-sky-400 to-indigo-500 transition-all" style="width:30%"></div></div>
-            </div>
-        </div>
-
-        <!-- 主對策區：完全解鎖高度限制 -->
-        <div class="p-4 flex flex-col space-y-3 h-auto">
-            
-            <!-- 頭像區 -->
+        <div class="p-4 flex flex-col space-y-4 h-auto">
             <div class="text-center flex items-center justify-center space-x-2">
                 <div id="avatar" class="text-4xl"></div>
-                <h2 id="scam-title" class="text-xl font-black text-white truncate"></h2>
+                <h2 id="scam-title" class="text-2xl font-black text-white truncate"></h2>
             </div>
             
-            <!-- 對話文本框：【重要改動】移除所有 max-h、min-h 與滾動條，字數再多也會全數展示 -->
             <div id="log" class="bg-slate-950 border-2 border-white/10 rounded-xl p-4 text-xl font-bold leading-relaxed text-slate-100 h-auto"></div>
 
-            <!-- 動態情報提示欄 -->
             <div id="hint-box" class="invisible min-h-[40px] bg-amber-500/20 border-2 border-amber-500/50 rounded-xl flex items-center justify-center text-center px-3 text-sm font-black text-amber-300">
                 提示文字
             </div>
 
-            <!-- 觀察到的訊息：【重要改動】改為自然向下排列，拒絕滑動框 -->
             <div class="flex flex-col">
-                <p class="text-xs font-black text-slate-400 mb-1">💡 觀察到嘅訊息（可解密）：</p>
+                <p class="text-xs font-black text-slate-400 mb-1">💡 觀察到嘅訊息線索（可對話解密）：</p>
                 <div id="tags-container" class="p-2 bg-slate-900 rounded-xl text-center flex flex-wrap justify-center items-center"></div>
             </div>
 
-            <!-- 操作按鈕區 -->
             <div class="space-y-2.5 pt-2">
                 <button id="chat-btn" onclick="takeAction('chat')" class="w-full py-3 bg-indigo-700 active:scale-[0.98] rounded-xl font-black transition-all flex flex-col items-center justify-center shadow-md">
-                    <span class="text-lg text-white" id="chat-text-main">💬 繼續傾下 (剩餘 2 次)</span>
-                    <span class="text-xs text-indigo-200 font-bold">看穿大話急切值即時 -10%</span>
+                    <span class="text-lg text-white" id="chat-text-main">💬 繼續傾下 (此輪: 3/3 | 全場: 6/6)</span>
+                    <span class="text-xs text-indigo-200 font-bold" id="chat-text-sub">抽絲剝繭核實線索真偽</span>
                 </button>
                 <div class="grid grid-cols-2 gap-2.5">
                     <button onclick="takeAction('small')" class="py-3 bg-emerald-700 active:scale-[0.98] rounded-xl font-black transition-all flex flex-col items-center justify-center shadow-md">
                         <span class="text-base text-white">💰 轉住少少錢先</span>
-                        <span class="text-xs text-emerald-200 font-bold">下輪數值下降</span>
+                        <span class="text-xs text-emerald-200 font-bold">姑且相信/試探</span>
                     </button>
                     <button onclick="takeAction('big')" class="py-3 bg-red-700 active:scale-[0.98] rounded-xl font-black transition-all flex flex-col items-center justify-center shadow-md">
                         <span class="text-base text-white">🔥 聽話轉大額錢</span>
@@ -127,7 +99,6 @@
             </div>
         </div>
 
-        <!-- 底部查證熱線 -->
         <div class="p-4 border-t-2 border-white/10 bg-slate-950">
             <button id="check-btn" onclick="goToCheck()" class="w-full py-3 bg-cyan-600 active:scale-[0.98] rounded-xl font-black transition-all flex flex-col items-center justify-center shadow-lg">
                 <span class="text-lg text-white">🛡️ 打 18222 防騙易熱線查證</span>
@@ -136,7 +107,6 @@
         </div>
     </div>
 
-    <!-- 熱線查證覆蓋視窗 -->
     <div id="modal-screen" class="hidden fixed inset-0 bg-black/85 flex items-center justify-center p-4 z-50">
         <div class="glass-panel rounded-3xl max-w-md w-full p-5 text-center border-2 border-cyan-500 h-auto">
             <div class="text-4xl mb-1">📞</div>
@@ -146,7 +116,6 @@
         </div>
     </div>
 
-    <!-- 結算畫面 -->
     <div id="end-screen" class="hidden fixed inset-0 bg-black/95 flex items-center justify-center p-4 z-50 overflow-y-auto">
         <div class="glass-panel rounded-3xl max-w-md w-full p-5 flex flex-col text-center border-2 border-white/30 h-auto my-auto">
             <div id="end-icon" class="text-6xl mb-2"></div>
@@ -160,40 +129,217 @@
             <p class="text-sm font-black text-slate-400 text-left mb-1">📋 你的完整行動歷程記錄：</p>
             <div id="risk-history" class="bg-slate-950 rounded-xl p-4 text-left text-sm font-bold space-y-2 border border-white/10 h-auto mb-4"></div>
             
-            <button onclick="restartGame()" class="w-full py-3 bg-gradient-to-r from-slate-100 to-white text-slate-900 font-black text-lg rounded-xl shadow-xl active:scale-95 transition-transform mt-2">再玩一次 🔄</button>
+            <button onclick="restartGame()" class="w-full py-3 bg-gradient-to-r from-slate-100 to-white text-slate-900 font-black text-lg rounded-xl shadow-xl active:scale-95 transition-transform mb-3">再玩一次 🔄</button>
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSde0K9q_4lHu3Ev-ih6EtdagEn8HZKdBPMR0QWQflDAu8jVCg/viewform?usp=publish-editor" target="_blank" class="block w-full py-3 bg-sky-600 hover:bg-sky-500 text-white font-bold text-base rounded-xl active:scale-[0.985] transition-colors">📝 填寫問卷（幫助我們改進）</a>
         </div>
     </div>
 
     <script>
-        // --- 核心運作 JS 完全不變（與原邏輯一致） ---
-        let urge = 30; let suspicion = 30; let riskPoints = 0; let round = 1; let chatCount = 0;
+        const TOTAL_ROUNDS = 6;
+        const MAX_GLOBAL_CHATS = 6; 
+        const MAX_ROUND_CHATS = 3; 
+
+        let riskPoints = 0; let round = 1; 
+        let globalChatCount = 0; 
+        let roundChatCount = 0; 
+        
         let currentTags = []; let currentType = "neutral"; let usedPersons = []; let history = []; 
         let checkUsed = false; let hasWronglyRefusedGood = false; 
 
-        const redFlags = ["要求即時轉帳", "強調情況極緊急", "保證穩賺不賠", "指定安全戶口", "叫你唔好話畀家人知", "回報異常極高", "不斷催促不要掛線"];
-        const greenFlags = ["純粹借錢交學費", "主動提出寫借據", "約定出嚟見面先交收", "提起以前確實嘅往事", "普通日常生活應急"];
-
         const scenarios = [
-            { avatar: "👵", title: "收到自稱「阿珍」嘅來電", baseText: "阿婆！我係你孫女阿珍呀。我下個月交學費唔夠錢，可唔可以先借兩萬蚊畀我應急？我遲啲出糧還返畀你，或者我下星期探你時寫返張借據？", type: "good" },
-            { avatar: "👴", title: "老鄰居「陳伯」致電借錢", baseText: "阿玉，我係以前住隔籬嘅陳伯。我老伴啱啱入左院要做小手術，醫藥費差幾千蚊，可唔可以借少少幫我週轉下？我叫我個仔聽日拎返現金還畀你。", type: "good" },
-            { avatar: "👵", title: "自稱「小儀」長途電話求助", baseText: "婆婆，我係你外孫女小儀呀。我而家喺英國讀書，生活費同書簿費都唔夠，可唔可以借三萬蚊畀我？我下個月就出糧，會即刻還返畀你。", type: "good" },
-            { avatar: "👴", title: "前茶餐廳同事「老李」來電", baseText: "阿玉，我係以前同你一齊做嘅老李呀。我而家退休金遲咗嚟，屋企有啲急用，可唔可以借少少錢？下個月退休金嚟到就即刻還你。", type: "good" },
-            { avatar: "📱", title: "陌生號碼：自稱你孫仔嘅朋友", baseText: "阿婆！我係你孫仔阿聰個朋友！佢啱啱同人撞車，依家受重傷喺醫院急需錢做手術呀！你快啲轉五萬蚊過嚟救人啦！", type: "scam" },
-            { avatar: "💼", title: "WhatsApp 虛擬貨幣投資顧問專員", baseText: "伯伯你好，我哋呢度有個最新嘅虛擬貨幣保本投資項目，回報高達三十厘！你依家轉得越多，之後賺得越多，名額有限啊！", type: "scam" },
-            { avatar: "🏦", title: "自稱金管局特派調查員來電", baseText: "你好，系統偵測到你嘅銀行帳戶涉及洗黑錢異常。請你即刻將名下所有存款轉帳到我哋政府指定嘅『安全監管戶口』配合調查。", type: "scam" },
-            { avatar: "❤️", title: "網上認識的外籍工程師老友", baseText: "親愛的，我寄咗份好名貴嘅金飾鑽戒去香港送畀你，但依家被海關扣留左。要你幫手轉帳一萬蚊交咗關稅先可以放行，你幫幫我好嗎？", type: "scam" },
-            { avatar: "🔌", title: "手機簡訊：電力欠費即時斷電通知", baseText: "【提示】你名下登記嘅物業電費已逾期，若果唔喺一小時內點擊以下連結，用轉數快補繳港幣 $1850 元，我哋將會採取即時斷電措施。", type: "scam" },
-            { avatar: "👮", title: "自稱「國內專案聯合調查組」法官", baseText: "我係中央專案調查組法官！你依家涉嫌一宗跨國金融詐騙案！請即刻將銀行存款轉去國家審查戶口，如果唔配合，我哋聽日就會凍結你所有財產！", type: "scam" },
-            { avatar: "👨‍👩‍👧", title: "自稱多年沒見的「內地遠房親戚」", baseText: "姑媽，我係阿華呀。我最近喺內地做生意爭人錢，急需一筆錢應急轉帳，你千祈千祈唔好同其他人或者你啲仔女講啊，好瘀口架。", type: "scam" },
-            { avatar: "📦", title: "自稱「順豐快遞物流中心」客服", baseText: "你好，你有一件寄往北京嘅快遞包裹被驗出大量違禁現金，依家被內地公安扣查，需要你轉繳三萬蚊保證金作無罪調查，否則會發出通緝令...", type: "scam" }
+            { 
+                avatar: "👩‍🦰", 
+                title: "自稱孫女「阿孫」嘅語音訊息", 
+                baseText: "阿婆！我係阿珍呀，我同朋友喺出面遇到啲急事呀，部手機又壞咗借人哋部電話打畀你。我依家好急需兩萬蚊現金應急，你可唔可以即刻轉數快畀我先？遲啲話你知發生咩事！", 
+                type: "scam",
+                flags: [
+                    { text: "語音聲音略顯生硬粗糙，推託話「感冒沙啞/電話收得差」拒絕多講", origin: "scam" },
+                    { text: "瘋狂重複「好急呀、救命呀」，語氣非常恐慌要求你轉帳", origin: "scam" },
+                    { text: "唔肯聽阿婆講完就主動掛斷，隨後改用不明陌生號碼傳來 FPS 登記名單與轉帳連結", origin: "scam" },
+                    { text: "雖然對方喺電話吹到好急，但嘗試打阿珍平時用開嘅個人手機，發現可以順利接通", origin: "good" },
+                    { text: "你故意問左一個假問題--你養嗰隻貓叫咩名」，對方答錯然後游說顧而言他", origin: "good" }
+                ]
+            },
+            { 
+                avatar: "👨", 
+                title: "仔仔「嘅視像通話」", 
+                baseText: "阿媽，我喺內地做生意俾人扣查咗部電腦，依家要交港幣三萬蚊罰款先放人。你睇下我？我真係喺辦事處入面呀，快啲匯錢去我傳畀你嘅戶口，遲啲就黎不如喇！", 
+                type: "scam",
+                flags: [
+                    { text: "視像畫面中兒子嘴型與配音嚴重不同步，背景光線死板疑似黑客循環播放舊片段", origin: "scam" },
+                    { text: "要求佢喺鏡頭前「用手打橫切過面部」，臉部邊緣隨即出現奇怪嘅扭曲閃爍(唔通係AI換臉技術？)", origin: "scam" },
+                    { text: "口口聲聲話交內地辦事處罰款，給出嘅收款戶口竟然係一個完全陌生嘅個人「轉數快」錢包", origin: "scam" },
+                    { text: "保持冷靜，立刻打普通電話給新抱（兒媳）或者佢公司內地生意夥伴求證，揭穿謊言", origin: "good" },
+                    { text: "要求對方將鏡頭即時擰轉，展示一下身處辦事處嘅四周實時動態環境，對方馬上心虛掛斷", origin: "good" }
+                ]
+            },
+            { 
+                avatar: "🏦", 
+                title: "中銀 (BOC Life) 扣款通知", 
+                baseText: "【BOC Life】重要通知：閣下嘅賬戶已開通「中銀城市生活會員」，系統今日開始會自動扣取 HKD 1786.49。如果唔係你本人操作而想取消扣款，請即刻致電熱線：3XXX XXXX，並提供你嘅身份證同銀行戶口資料以便核實辦理。", 
+                type: "scam",
+                flags: [
+                    { text: "仔細查看發送簡訊嘅號碼，並非官方註冊嘅「#BOCHK」短訊名稱，而係普通不明+86手機號碼", origin: "scam" },
+                    { text: "如果點擊簡訊連結，會導向一個粗製濫造嘅假網頁，強烈要求輸入網上銀行密碼及一次性驗證碼", origin: "scam" },
+                    { text: "故意利用毫子尾數「.49」大玩心理戰，刻意模仿真正銀行扣帳單，試圖製造確有其事嘅恐慌感", origin: "scam" },
+                    { text: "完全不理會簡訊，自行登入中銀官方 App 或翻查存摺，發現根本無呢筆所謂嘅扣款申請", origin: "good" },
+                    { text: "不隨便撥打簡訊電話，親身步行到附近中銀分行，找櫃位職員直接協助核對戶口安全狀態", origin: "good" }
+                ]
+            },
+            { 
+                avatar: "📱", 
+                title: "中銀 (BOCHK) 訂閱過數提醒", 
+                baseText: "#BOCHK 您訂閱嘅「生活會員」已到期，今晚 12 點前戶口將會產生自動過數 HKD 50400！若非本人操作或需要查詢詳情，請即刻撥打熱線：3XXX XXXX。逾時過數後，系統將無法撤回扣款申請！", 
+                type: "scam",
+                flags: [
+                    { text: "刻意設定「今晚12點前」限時倒數，希望你越快轉賬越好", origin: "scam" },
+                    { text: "簡訊內提供嘅查詢熱線號碼，與提款卡背面印製嘅官方二十四小時客戶服務專線完全不符", origin: "scam" },
+                    { text: "客服喺電話中態度極其強硬，話你如果「唔交出SMS六位數驗證碼，就代表你自願被扣五萬蚊」", origin: "scam" },
+                    { text: "翻看個人銀行卡背面，直接撥打官方標明嘅 24小時 客服專線或親往分行核查", origin: "good" },
+                    { text: "冷靜落嚟並堅信防騙最高守則：官方銀行絕對不可能在電話或簡訊中索取密碼與驗證碼", origin: "good" }
+                ]
+            },
+            { 
+                avatar: "🏢", 
+                title: "自稱樓下住戶「張女士」", 
+                baseText: "你好，我係你樓下張女士。你晚晚 10 點半後都好嘈，尋晚直頭震裂咗我天花板盞名貴水晶燈！請你即刻加我 WhatsApp 3XXX XXXX，我傳個損毀影片畀你。你要賠返五千蚊維修費私了，否則我會報警同埋告去辦事處！", 
+                type: "scam",
+                flags: [
+                    { text: "利用你怕事嘅心態，上綱上線進行言語恐嚇，而且你連從頭到尾都只聞其聲不見其人", origin: "scam" },
+                    { text: "堅拒開門當面傾，一味逼你私下加 WhatsApp 點擊來歷不明、包裝成「損毀影片」嘅不明連結檔案", origin: "scam" },
+                    { text: "拒絕提供自己具體嘅樓層與門牌號碼，含糊其辭只自稱「總之就係住入你樓下嘅張姐」", origin: "scam" },
+                    { text: "提議經由大廈物業管理處保安主管上門，或者聯絡業主立案法團代表共同進屋檢查", origin: "good" },
+                    { text: "回想自己昨晚早早入睡根本無弄出任何撞擊噪音，對對方的誇張指控產生合理懷疑", origin: "good" }
+                ]
+            },
+            { 
+                avatar: "📦", 
+                title: "快遞包裹遺失理賠專線", 
+                baseText: "尊敬嘅客戶，派送員不慎丟失咗您嘅貴重包裹！請即撥打理賠專線：3XXX XXXX。我們會全額賠償你嘅損失，但按程序您需要先支付一筆 HKD 2000 嘅「理賠保證金」以激活轉帳功能。請於 2 小時內聯繫處理，過時不補！", 
+                type: "scam",
+                flags: [
+                    { text: "賠償本屬快遞公司責任，卻本末倒置、無理要求被害人「先支付保證金/手續費」才可以收錢", origin: "scam" },
+                    { text: "簡訊連結同官方順豐或郵政介面有些許出入，并且點擊除付款外的按鈕沒有任何反應，並強烈催促在短暫嘅 2 小時內完成操作。", origin: "scam" },
+                    { text: "電話客服不斷套問你銀行戶口仲有幾多結餘，宣稱保證金會隨後透過另一個管道全數退回", origin: "scam" },
+                    { text: "揾出原本購物嘅網購應用程式（如淘寶、HKTVmall），核對官方物流動態，證實包裹其實根本未到港", origin: "good" }
+                ]
+            },
+            { 
+                avatar: "👵", 
+                title: "孫女「阿珍」嘅來電", 
+                baseText: "阿婆！我係你孫女阿珍呀。我下個月交大學學費仲差少少唔夠錢，可唔可以先借兩萬蚊畀我應急？我遲啲返兼職出糧還返畀你。我下星期放假買你最鍾意食嘅蛋撻過嚟探你，順便寫返張借據畀你呀？", 
+                type: "good",
+                flags: [
+                    { text: "主動提議可以親自「寫借據」，且完全坦蕩，不反對阿婆同其他家庭成員商量求證", origin: "good" },
+                    { text: "對答流暢自然，能說出只有你地兩個知道嘅兒時外號、身體近況或生活小習慣", origin: "good" },
+                    { text: "提議下星期放假可以直接親自過嚟探望，面對面傾、交收現金或者支票最安心", origin: "good" },
+                    { text: "雖然口吻非常真誠，但長者為求保險，仍堅持透過打給阿珍媽媽作雙重核實", origin: "good" }
+                ]
+            },
+			{ 
+                avatar: "📈", 
+                title: "Whatsapp Group「麥玲玲/李居明 推薦港股必賺群組」", 
+                baseText: "【老友記福利】玲玲師傅同多位香港著名股評人合作，利用最新「AI 智能系統」幫你預測港股走勢！首 50 名加入 WhatsApp 投資群組嘅街坊，可以免費獲得明日必升股代號，包你賺到盆滿缽滿，穩陣過收息！", 
+                type: "scam",
+                flags: [
+                    { text: "群組內每日有幾十個自稱「陳太」、「何伯」嘅人瘋狂貼出賺大錢嘅截圖", origin: "scam" },
+                    { text: "「群組老師」教你下載一個不明嘅投資 App，聲稱可以用「秘密通道」低價申購高收益新股", origin: "scam" },
+                    { text: "群組內所謂大師拍嘅強烈推薦影片，其聲音同嘴型有細微不自然，有D似名嘴股票師，但係又有時候有電音", origin: "scam" },
+                    { text: "使用香港證監會（SFC）官方網頁查詢，發現該投資 App 及所謂嘅投資機構根本係「無牌公司及 suspicious 網站名單」中", origin: "good" },
+                    { text: "世上沒有「穩賺不賠」嘅投資，任何自稱投資導師並要求將資金轉入「個人銀行戶口」嘅一律視為詐騙", origin: "good" }
+                ]
+            },
+			{ 
+                avatar: "🩺", 
+                title: "「醫療輔助隊/衞生署」長者醫療券異常通知", 
+                baseText: "【衞生署重要通告】系統發現閣下嘅「長者醫療券」賬戶涉嫌違規聯同私家診所「套現」政府資助。我哋即將無限期凍結你嘅醫療券使用權限，並會轉交執法部門調查。請即點擊以下政府連結 www.dh-gov-hk.top 登記你嘅身份證及常用網銀以配合調查。", 
+                type: "scam",
+                flags: [
+                    { text: "點擊連結後，網頁介面雖然有齊「特區政府徽章」，但細看網址後綴並非官方嘅「.gov.hk」，而係奇怪的「.top/.cc」", origin: "scam" },
+                    { text: "網頁極力要求你輸入網上銀行密碼、身份證正面相片，以及手機剛剛收到嘅「SMS 一次性六位數字驗證碼」", origin: "scam" },
+                    { text: "打電話嚟嘅「衞生署職員」語氣極其嚴厲，不斷用「取消長者福利、留有刑事案底」來恐嚇你，逼你立刻係網頁完成登記", origin: "scam" },
+                    { text: "不點擊任何簡訊連結，直接致電衞生署醫療券查詢熱線 (2838 2311) 或親自到醫務所搵相熟醫生幫手翻查賬戶", origin: "good" },
+                ]
+            },
+            { 
+                avatar: "👴", 
+                title: "老鄰居「陳伯」致電借錢", 
+                baseText: "阿玉，我係以前住隔籬鄰舍嘅陳伯呀。我老伴啱啱入咗院要做個小手術，醫藥費爭幾千蚊，可唔可以借少少幫我週轉下？我叫我個仔聽日收工直接拎現金過嚟你樓下還返畀你。", 
+                type: "good",
+                flags: [
+                    { text: "主動明確表示不需要長者去櫃員機操作，可以叫佢個仔聽日收工「親自拎現金」過嚟還錢", origin: "good" },
+                    { text: "主動提到以前屋邨老街坊敘舊嘅往事（如在走廊一齊乘涼聊天），語氣充滿老鄰居特有嘅人情味與客氣", origin: "good" },
+                    { text: "完全不反對長者表示要先問過仔女意見，態度誠懇和藹，絕不用話術強人所難或催促急迫", origin: "good" },
+                    { text: "借款數額合理（僅限幾千元手術尾數），且詳細交代醫藥費出入，絕非漫天要價嘅無底深潭", origin: "good" }
+                ]
+            }
+			{ 
+                avatar: "👮", 
+                title: "自稱「香港警務處反詐騙協調中心」官員", 
+                baseText: "你好，我係香港警務處反詐騙協調中心（ADCC）嘅陳警官。我哋系統偵測到你嘅個人資料與一宗涉及幾百萬港幣嘅內地洗黑錢案有關。我依家將你條線轉駁到內地公安特偵組，你必須即刻配合「資產審查」，否則我哋會聯同入境處去你屋企進行拘捕！", 
+                type: "scam",
+                flags: [
+                    { text: "轉駁電話後，自稱「北京公安」嘅人用普通話對答，仲可以精準講出你嘅身份證號碼", origin: "scam" },
+                    { text: "對方傳來一張附有你相片同名字嘅假「最高人民檢察院凍結管制令」，逼你加 WhatsApp 進行 24 小時視像監控", origin: "scam" },
+                    { text: "要求你將所有積蓄轉移到一個「由香港法院託管嘅安全賬戶」，或者要求你下載一個非官方嘅 App 登入網上銀行", origin: "scam" },
+                    { text: "你聽過香港警方與執法部門絕對不會將電話轉駁至內地執法機關，更不會要求市民提供密碼或轉賬「自查資產」", origin: "good" },
+                    { text: "你收線後親自撥打香港警務處官方「防騙易熱線 18222」求證", origin: "good" }
+                ]
+            },
+			{ 
+                avatar: "⚡", 
+                title: "「中華電力 (CLP)」智能電錶異常與斷電警告", 
+                baseText: "【中電緊急通知】系統偵測到閣下單位嘅智能電錶出現嚴重數據異常，懷疑干犯非法偷電行為。我哋將於今晚 6 點實施強制斷電！如需暫緩斷電並安排緊急師傅上門檢查，請立刻致電中電緊急辦公室電話：3XXX XXXX，並準備 HKD 3,000 師傅按金。", 
+                type: "scam",
+                flags: [
+                    { text: "「客服」在電話中不斷催促，話「如果 6 點前收唔到按金轉賬，全屋電器壞咗中電一概不負責」", origin: "scam" },
+                    { text: "給出嘅轉賬方式竟然是個人嘅轉數快（FPS）電話號碼，而非中電官方繳費賬單渠道（如 PPS 或中電專屬戶口）", origin: "scam" },
+                    { text: "翻查最近一期嘅實體中電電費單，撥打電費單上面印製嘅官方客戶服務熱線（2678 2678）查詢", origin: "good" },
+                    { text: "你記得電力公司即使要進行維修或檢查，會提前發出正式書面通知，更不會要求市民以個人 FPS 即時轉賬給師傅", origin: "good" }
+                ]
+            }
+			{ 
+                avatar: "🏘️", 
+                title: "房署/屋苑管理處「入屋年度維修檢查」", 
+                baseText: "你好，我係物業管理處嘅陳主任。我哋將會喺下星期二下晝進行全座大廈嘅食水管年度檢查，需要入屋視察大約 15 分鐘。請問你到時有無人喺屋企？如果唔方便，可以依家幫你更改時間。", 
+                type: "good",
+                flags: [
+                    { text: "大廈大堂有正式告示，列明檢查日期、範圍同埋負責人員嘅姓名及工號", origin: "good" },
+                    { text: "明確表示檢查係完全免費并且自願，唔會要求現場收取按金、零件費或任何形式嘅現金交易", origin: "good" },
+                    { text: "主任主動提醒你可以喺開門前，要求佢哋出示帶有照片嘅職員證，並建議你聯絡大堂保安員核實其身份", origin: "good" },
+                    { text: "「負責人員」表示不急於開門，你可以先打去管理處官方電話確認當日確實有安排入屋維修計劃", origin: "good" }
+                ]
+            },
+			{ 
+                avatar: "📦", 
+                title: "「順豐速運」派件員電話", 
+                baseText: "喂，你好！順豐快遞呀，你有件海外包裹要送過嚟，但我依家喺你樓下發現你個地址寫得唔係好清楚，請問你係咪住喺 16 樓 B 室？如果無人收，我幫你放喺管理處定係遲啲再送過嚟？", 
+                type: "good",
+                flags: [
+                    { text: "對方可以準確講出你嘅姓氏同埋大致嘅收件地址，重點係佢表示絕對唔會要求你支付任何「附加費」或「保證金」", origin: "good" },
+                    { text: "派件員語氣匆忙，但目的是確認收件位置", origin: "good" },
+                    { text: "你告知對方稍後會自行去「順豐站」拎，對方爽快答應並提供單號讓你查詢", origin: "good" },
+                    { text: "你自行打開官方網購 App（如淘寶或 HKTVmall），確認物流狀態確實顯示「正在派送中」", origin: "good" }
+                ]
+            }
         ];
 
+        function generateFlagsForScenario(scamObj) {
+            let flags = [...scamObj.flags];
+            let scamTriggers = flags.filter(f => f.origin === "scam").sort(() => 0.5 - Math.random()).slice(0, 2);
+            let safeTriggers = flags.filter(f => f.origin === "good").sort(() => 0.5 - Math.random()).slice(0, 1);
+            
+            let finalTags = [...scamTriggers, ...safeTriggers].map(f => {
+                return { text: f.text, status: "mystery", origin: f.origin };
+            });
+
+            return finalTags.sort(() => Math.random() - 0.5);
+        }
+
         function updateUI() {
-            document.getElementById('urge-val').textContent = urge + '%';
-            document.getElementById('urge-bar').style.width = urge + '%';
-            document.getElementById('suspicion-val').textContent = suspicion + '%';
-            document.getElementById('suspicion-bar').style.width = suspicion + '%';
             document.getElementById('turn-count').textContent = String(round).padStart(2, '0');
+            document.getElementById('total-round-count').textContent = String(TOTAL_ROUNDS).padStart(2, '0');
+            updateChatButton();
         }
 
         function renderTags() {
@@ -206,192 +352,186 @@
             }).join('');
         }
 
-        function addSpecificFlag(flagType) {
-            let targetPool = flagType === "good" ? greenFlags : redFlags;
-            let existingTexts = currentTags.map(t => t.text);
-            let availableFlags = targetPool.filter(f => !existingTexts.includes(f));
-            if (availableFlags.length > 0) {
-                let newFlagText = availableFlags[Math.floor(Math.random() * availableFlags.length)];
-                currentTags.push({ text: newFlagText, status: "mystery", origin: flagType });
-            }
-        }
-
-        function showHint(text) {
+        function showHint(text, isAlert = false) {
             const hBox = document.getElementById('hint-box');
-            hBox.textContent = text; hBox.classList.remove('invisible');
+            hBox.textContent = text; 
+            hBox.classList.remove('invisible');
+            if (isAlert) {
+                hBox.className = "min-h-[40px] bg-red-500/20 border-2 border-red-500/50 rounded-xl flex items-center justify-center text-center px-3 text-sm font-black text-red-300 animate-pulse";
+            } else {
+                hBox.className = "min-h-[40px] bg-amber-500/20 border-2 border-amber-500/50 rounded-xl flex items-center justify-center text-center px-3 text-sm font-black text-amber-300";
+            }
         }
 
         function clearHint() { document.getElementById('hint-box').classList.add('invisible'); }
 
         function showNewScam() {
-            clearHint(); let available = []; let hasGoodPerson = false;
-            for (let i = 0; i < usedPersons.length; i++) {
-                if (scenarios[usedPersons[i]] && scenarios[usedPersons[i]].type === "good") hasGoodPerson = true;
-            }
-            if (round === 4 && !hasGoodPerson) {
-                for (let i = 0; i < scenarios.length; i++) {
-                    if (!usedPersons.includes(i) && scenarios[i].type === "good") available.push(i);
-                }
-            }
-            if (available.length === 0) {
-                for (let i = 0; i < scenarios.length; i++) {
-                    if (!usedPersons.includes(i)) available.push(i);
-                }
+            clearHint();
+            roundChatCount = 0; 
+
+            let available = [];
+            for (let i = 0; i < scenarios.length; i++) {
+                if (!usedPersons.includes(i)) available.push(i);
             }
             if (available.length === 0) {
                 available = Array.from({length: scenarios.length}, (_, i) => i); usedPersons = [];
             }
 
             const idx = available[Math.floor(Math.random() * available.length)];
-            usedPersons.push(idx); const scam = scenarios[idx];
+            usedPersons.push(idx); 
+            const scam = scenarios[idx];
 
             document.getElementById('avatar').textContent = scam.avatar;
             document.getElementById('scam-title').textContent = scam.title;
             document.getElementById('log').innerHTML = scam.baseText;
-            currentType = scam.type; currentTags = []; chatCount = 0;
+            currentType = scam.type;
 
-            addSpecificFlag(currentType); addSpecificFlag(currentType);
-            addSpecificFlag(currentType === "good" ? "scam" : "good"); 
-            currentTags.sort(() => Math.random() - 0.5);
+            currentTags = generateFlagsForScenario(scam);
 
-            renderTags(); updateChatButton();
-            
-            // 每次換新一輪時，自動將手機頁面滑動到最上方
+            renderTags(); updateUI();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function updateChatButton() {
             const btn = document.getElementById('chat-btn');
             const mainText = document.getElementById('chat-text-main');
-            if (chatCount >= 2) {
-                mainText.textContent = "請即刻作抉擇！";
+            const subText = document.getElementById('chat-text-sub');
+            
+            let globalRemaining = MAX_GLOBAL_CHATS - globalChatCount;
+            let roundRemaining = MAX_ROUND_CHATS - roundChatCount;
+
+            if (globalRemaining <= 0 || roundRemaining <= 0) {
                 btn.classList.add('btn-disabled'); btn.onclick = null;
+                mainText.textContent = `⚠️ 暫無更多線索`;
+                subText.textContent = `此輪或全場對話次數已用盡，請做出你的決定！`;
+                showHint("⚠️ 暫無更多線索，請做出你的決定！", true);
             } else {
-                mainText.textContent = `💬 繼續傾下 (剩餘 ${2 - chatCount} 次)`;
                 btn.classList.remove('btn-disabled'); btn.onclick = () => takeAction('chat');
+                mainText.textContent = `💬 繼續傾下 (此輪: ${roundRemaining} | 全場: ${globalRemaining})`;
+                subText.textContent = `抽絲剝繭核實線索真偽`;
             }
         }
 
         function takeAction(action) {
+            const titleName = document.getElementById('scam-title').textContent;
+
             if (action === 'chat') {
-                if (chatCount >= 2) return;
-                let urgeGain = Math.floor(Math.random() * 8) + 5;        
-                let suspicionGain = Math.floor(Math.random() * 11) + 8; 
-                urge += urgeGain; suspicion += suspicionGain; chatCount++;
+                if (globalChatCount >= MAX_GLOBAL_CHATS || roundChatCount >= MAX_ROUND_CHATS) return;
+                
+                globalChatCount++; 
+                roundChatCount++; 
 
                 let mysteries = currentTags.filter(t => t.status === 'mystery');
                 if (mysteries.length > 0) {
-                    let wrongFlags = mysteries.filter(t => t.origin !== currentType);
-                    if (wrongFlags.length > 0 && Math.random() < 0.7) { 
-                        let removeTarget = wrongFlags[Math.floor(Math.random() * wrongFlags.length)];
-                        currentTags = currentTags.filter(t => t.text !== removeTarget.text);
-                        urge -= 10; 
-                        showHint(`💡 剔除誤導情報「${removeTarget.text}」！(急切值 -10%)`);
+                    // 已修正：完全刪除「隨機濾走/蒸發標籤」的舊代碼。
+                    // 現在每按一次對話，必然會隨機抽出一個灰色標籤進行「解密揭秘」，所有 flag 都不會消失！
+                    let target = mysteries[Math.floor(Math.random() * mysteries.length)];
+                    target.status = (target.origin === 'good') ? 'green' : 'red';
+                    
+                    // 根據解密出來的標籤狀態，給予精準的心理提示引導
+                    if (target.status === 'green') {
+                        showHint(`🟢 💡 精明提示：${target.text}（記住呢個正確做法！）`);
                     } else {
-                        let target = mysteries[Math.floor(Math.random() * mysteries.length)];
-                        target.status = (target.origin === 'good') ? 'green' : 'red';
-                        showHint(`🔍 發現細節：「${target.text}」！(急切+${urgeGain}%)`);
+                        showHint(`🔴 🚨 識破破綻：${target.text}（呢個係騙徒嘅馬腳！）`);
                     }
                 } else {
-                    addSpecificFlag(currentType); showHint("💬 對方不甘心繼續解釋，露出了更多馬腳...");
+                    showHint("💬 對方神色開始慌張/急躁，但你已經無辦法獲得更多資訊。");
                 }
                 
-                urge = Math.max(0, Math.min(100, urge)); suspicion = Math.max(0, Math.min(100, suspicion));
-                updateUI(); renderTags(); updateChatButton();
-
-                if (urge >= 100) { endGame(false, "❌ 失敗：你內心徹底慌亂，在極度焦急下糊里糊塗轉走咗積蓄！"); return; }
-                if (suspicion >= 100) { endGame(false, "❌ 失敗：你精神過度緊張崩潰，錯失救援黃金期..."); return; }
+                renderTags(); updateUI();
                 return;
             }
 
             if (action === 'small') {
                 if (currentType !== "good") {
-                    riskPoints += 1; history.push({ round: round, action: `在【${document.getElementById('scam-title').textContent}】中動搖分批轉小額`, risk: 1 });
+                    riskPoints += 1; 
+                    history.push({ round: round, action: `在【${titleName}】中動搖分批轉小額`, risk: 1, type: 'wrong' });
                 } else {
-                    history.push({ round: round, action: `在【${document.getElementById('scam-title').textContent}】中支援親友小額`, risk: 0 });
+                    history.push({ round: round, action: `在【${titleName}】中支援親友小額`, risk: 0, type: 'correct' });
                 }
             } else if (action === 'big') {
                 if (currentType === "scam") {
-                    riskPoints += 3; history.push({ round: round, action: `落入陷阱！在【${document.getElementById('scam-title').textContent}】中一次過轉大額`, risk: 3 });
+                    riskPoints += 3; 
+                    history.push({ round: round, action: `落入陷阱！在【${titleName}】中一次過轉大額`, risk: 3, type: 'wrong' });
                 } else {
-                    history.push({ round: round, action: `在【${document.getElementById('scam-title').textContent}】中全力援助親友`, risk: 0 });
+                    history.push({ round: round, action: `在【${titleName}】中全力援助親友`, risk: 0, type: 'correct' });
                 }
             } else if (action === 'refuse') {
                 if (currentType === "good") {
-                    hasWronglyRefusedGood = true; history.push({ round: round, action: `誤判！拒絕了真正需要幫忙的親友【${document.getElementById('scam-title').textContent}】`, risk: 0 });
+                    hasWronglyRefusedGood = true; 
+                    history.push({ round: round, action: `誤判！拒絕了真正需要幫忙的親友【${titleName}】`, risk: 0, type: 'warn' });
                 } else {
-                    history.push({ round: round, action: `英明！果斷拒絕並封鎖了騙徒【${document.getElementById('scam-title').textContent}】`, risk: 0 });
+                    history.push({ round: round, action: `英明！果斷拒絕並封鎖了騙徒【${titleName}】`, risk: 0, type: 'correct' });
                 }
             }
 
-            let urgeFluctuation = Math.floor(Math.random() * 11) + 5; 
-            let suspicionFluctuation = Math.floor(Math.random() * 11) + 5;
-            urge = Math.max(15, Math.min(90, urge - urgeFluctuation));
-            suspicion = Math.max(15, Math.min(90, suspicion - suspicionFluctuation));
-            updateUI();
-
-            if (round >= 10) { endGame(true); } else { round++; showNewScam(); }
+            if (round >= TOTAL_ROUNDS) { endGame(); } else { round++; showNewScam(); }
         }
 
         function goToCheck() {
             if (checkUsed) return;
             checkUsed = true; document.getElementById('check-btn').classList.add('btn-disabled'); document.getElementById('check-btn').onclick = null;
-            let result = currentType === "good" ? "🛡️ 經核實，對方講嘅身份同借錢情況屬實，係真正嘅親友。" : "🚨 極度危險！！呢個係不折不扣嘅金錢詐騙陷阱！對方絕對係騙徒！";
-            history.push({ round: round, action: `機警！打防騙易熱線查證【${document.getElementById('scam-title').textContent}】`, risk: 0 });
+            let result = currentType === "good" ? "🛡️ 經核實，對方講嘅身份同情況屬實，係真正嘅親友。" : "🚨 極度危險！！呢個係利用新技術或話術嘅金錢詐騙陷阱！對方絕對係騙徒！";
+            
+            history.push({ round: round, action: `機警！打防騙易熱線查證【${document.getElementById('scam-title').textContent}】`, risk: 0, type: 'correct' });
             document.getElementById('modal-message').textContent = result + "\n\n(熱線已成功為你攔截本次風險，本輪直接安全跳過！)";
             document.getElementById('modal-screen').classList.remove('hidden');
         }
 
         function closeModal() {
-            document.getElementById('modal-screen').classList.add('hidden'); urge = 20; suspicion = 20; updateUI();
-            if (round >= 10) { endGame(true); } else { round++; showNewScam(); }
+            document.getElementById('modal-screen').classList.add('hidden');
+            if (round >= TOTAL_ROUNDS) { endGame(); } else { round++; updateUI(); showNewScam(); }
         }
 
-        function endGame(isWin = true, customMsg = "") {
+        function endGame() {
             document.getElementById('game-container').classList.add('hidden');
             const screen = document.getElementById('end-screen'); screen.classList.remove('hidden');
-            document.getElementById('end-round-status').textContent = `你最終成功挑戰到了第 ${round} 輪。`;
-
-            if (customMsg) {
-                document.getElementById('end-icon').textContent = "💥"; document.getElementById('end-title').textContent = "心理防線失守";
-                document.getElementById('end-title').className = "text-2xl font-black mb-2 text-rose-500"; document.getElementById('end-message').textContent = customMsg;
-                let h = history.length === 0 ? '<p class="text-emerald-400 font-bold">👍 幸好你並無對騙徒進行過任何金錢轉帳。</p>' : history.map(h => `<p class="text-rose-400">第 ${h.round} 輪：${h.action}</p>`).join('');
-                document.getElementById('risk-history').innerHTML = h; return;
-            }
+            document.getElementById('end-round-status').textContent = `你最終成功挑戰了全部 ${TOTAL_ROUNDS} 輪遊戲。`;
 
             let title, message, iconClass, iconEmoji;
-            if (riskPoints > 6) {
-                iconEmoji = "💀"; title = "傾家蕩產！🚨"; message = `你累積了 ${riskPoints} 點高危操作。辛苦大半世嘅棺材本全部被搬空！`; iconClass = "text-red-600";
+
+            if (riskPoints >= 4) {
+                iconEmoji = "💀"; title = "傾家蕩產！🚨😭😭😭🚨"; message = `你累積了 ${riskPoints} 點高危操作。辛苦大半世嘅錢財全部被搬空！`; iconClass = "text-red-600";
             } else if (riskPoints === 0 && !hasWronglyRefusedGood) {
-                iconEmoji = "👑"; title = "傳奇·神級防騙大師！🏆"; message = "天衣無縫！你沒有踩中任何陷阱，同時完美向所有真親友施以援手！"; iconClass = "text-emerald-400";
+                iconEmoji = "👑"; title = "傳奇·神級防騙大師！🏆"; message = "天衣無縫！你完美看穿所有新科技與生活詐騙陷阱，同時精準向真親友施以援手！"; iconClass = "text-emerald-400";
             } else if (riskPoints === 0 && hasWronglyRefusedGood) {
-                iconEmoji = "🌵"; title = "孤獨防禦型老友記"; message = "你守住了每一分棺材本。可惜你因過度防備，誤將真正身陷困境的親人當成了騙子。"; iconClass = "text-sky-400";
-            } else if (riskPoints <= 3) {
-                iconEmoji = "⚠️"; title = "精明老友記（守住老本）"; message = `雖然中途有 ${riskPoints} 次不小心做咗危險轉帳，但老本基本無損！`; iconClass = "text-amber-400";
+                iconEmoji = "🌵"; title = "孤獨防禦型老友記"; message = "你成功守住了每一分每一豪。可惜你因為過度防備，誤將真正身陷困境的親人拒之門外。"; iconClass = "text-yellow-400";
+            } else if (riskPoints <= 2) {
+                iconEmoji = "⚠️"; title = "精明老友記（守住老本）"; message = `雖然中途有 ${riskPoints} 次不小心做咗危險嘗試，但整體老本安然無損！`; iconClass = "text-amber-400";
             } else {
-                iconEmoji = "❌"; title = "損失慘重，防線失守"; message = `你累積了 ${riskPoints} 點風險點數。部分血汗錢已經不幸落入騙徒口袋！`; iconClass = "text-rose-500";
+                iconEmoji = "❌"; title = "損失慘重，防線失守"; message = `你累積了 ${riskPoints} 點風險。部分血汗錢已經不幸落入騙徒口袋！`; iconClass = "text-rose-500";
             }
 
-            document.getElementById('end-icon').textContent = iconEmoji; document.getElementById('end-title').textContent = title;
-            document.getElementById('end-title').className = `text-2xl font-black mb-2 ${iconClass}`; document.getElementById('end-message').textContent = message;
-            let h = history.length === 0 ? '<p class="text-emerald-400 font-bold">✅ 完美紀錄：你無進行過任何危險交易。</p>' : history.map(h => `<p class="text-rose-400">⚠️ 第 ${h.round} 輪：${h.action}</p>`).join('');
+            document.getElementById('end-icon').textContent = iconEmoji; 
+            document.getElementById('end-title').textContent = title;
+            document.getElementById('end-title').className = `text-2xl font-black mb-2 ${iconClass}`; 
+            document.getElementById('end-message').textContent = message;
+
+            let h = history.length === 0 ? '<p class="text-emerald-400 font-bold">✅ 完美紀錄：你無進行過任何危險交易。</p>' : history.map(h => {
+                let colorClass = 'text-rose-400'; let prefixSign = '🔴';
+                if (h.type === 'correct') { colorClass = 'text-emerald-400'; prefixSign = '🟢'; } 
+                else if (h.type === 'warn') { colorClass = 'text-yellow-400'; prefixSign = '🟡'; }
+                return `<p class="${colorClass}">${prefixSign} 第 ${h.round} 輪：${h.action}</p>`;
+            }).join('');
+            
             document.getElementById('risk-history').innerHTML = h;
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function startGame() {
-            document.getElementById('intro-screen').classList.add('hidden'); document.getElementById('game-container').classList.remove('hidden');
-            urge = Math.floor(Math.random() * 20) + 25; suspicion = Math.floor(Math.random() * 20) + 25; updateUI(); showNewScam();
+            document.getElementById('intro-screen').classList.add('hidden'); 
+            document.getElementById('game-container').classList.remove('hidden');
+            showNewScam();
         }
 
         function restartGame() {
-            urge = 30; suspicion = 30; round = 1; riskPoints = 0; chatCount = 0; currentTags = []; usedPersons = []; history = []; checkUsed = false; hasWronglyRefusedGood = false;
-            document.getElementById('end-screen').classList.add('hidden'); document.getElementById('game-container').classList.remove('hidden');
-            document.getElementById('check-btn').classList.remove('btn-disabled'); document.getElementById('check-btn').onclick = () => goToCheck();
-            urge = Math.floor(Math.random() * 20) + 25; suspicion = Math.floor(Math.random() * 20) + 25; updateUI(); showNewScam();
+            round = 1; riskPoints = 0; globalChatCount = 0; roundChatCount = 0; currentTags = []; usedPersons = []; history = []; checkUsed = false; hasWronglyRefusedGood = false;
+            document.getElementById('end-screen').classList.add('hidden'); 
+            document.getElementById('game-container').classList.remove('hidden');
+            document.getElementById('check-btn').classList.remove('btn-disabled'); 
+            document.getElementById('check-btn').onclick = () => goToCheck();
+            showNewScam();
         }
-
-        urge = Math.floor(Math.random() * 20) + 25; suspicion = Math.floor(Math.random() * 20) + 25; updateUI();
     </script>
 </body>
 </html>
